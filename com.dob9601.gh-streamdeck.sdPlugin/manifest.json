@@ -1,0 +1,46 @@
+{
+    "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+    "Name": "GitHub Monitor",
+    "Version": "0.1.0.0",
+    "Author": "dob9601",
+    "Actions": [
+        {
+            "Name": "GitHub Monitor",
+            "UUID": "com.dob9601.gh-streamdeck.increment",
+            "Icon": "imgs/actions/counter/icon",
+            "Tooltip": "Displays a count, which increments by one on press.",
+            "PropertyInspectorPath": "ui/increment-counter.html",
+            "Controllers": ["Keypad"],
+            "States": [
+                {
+                    "Image": "imgs/actions/monitor/github",
+                    "TitleAlignment": "bottom"
+                }
+            ]
+        }
+    ],
+    "Category": "GitHub",
+    "CategoryIcon": "imgs/plugin/category-icon",
+    "CodePath": "bin/plugin.js",
+    "Description": "Monitor your GitHub assigned issues, pull requests and more from the comfort of your Stream Deck",
+    "Icon": "imgs/plugin/marketplace",
+    "SDKVersion": 3,
+    "Software": {
+        "MinimumVersion": "6.9"
+    },
+    "OS": [
+        {
+            "Platform": "mac",
+            "MinimumVersion": "12"
+        },
+        {
+            "Platform": "windows",
+            "MinimumVersion": "10"
+        }
+    ],
+    "Nodejs": {
+        "Version": "20",
+        "Debug": "enabled"
+    },
+    "UUID": "com.dob9601.gh-streamdeck"
+}
