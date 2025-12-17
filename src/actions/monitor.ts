@@ -95,6 +95,8 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerSettings> {
             let index = 0;
             const actions = [...streamDeck.actions];
 
+            this.urlMapping = {};
+
             outer: for (const [dataType, items] of Object.entries(data)) {
                 let icon;
                 if (dataType === "authoredPullRequests") {
