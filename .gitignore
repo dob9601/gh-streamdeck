@@ -5,4 +5,4 @@ node_modules/
 *.sdPlugin/bin
 *.sdPlugin/logs
 
-.DS_S
+.DS_Store

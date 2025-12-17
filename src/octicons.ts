@@ -1,3 +1,6 @@
+// https://brand.github.com/foundations/color#primary-palette
+const GITHUB_GREEN_4_HEX = "#08872B";
+
 interface OcticonRenderOptions {
     color: string;
     viewBox: string;
@@ -41,7 +44,7 @@ export function renderPullRequestIcon(
     opts?: ExtendedOcticonRenderOptions,
 ): string {
     const prefilledOpts: Required<OcticonRenderOptions> = {
-        color: opts?.color ?? "white",
+        color: opts?.color ?? GITHUB_GREEN_4_HEX,
         viewBox: opts?.viewBox ?? calculateViewbox("0 0 24 24", opts),
     };
     return renderOcticon(PULL_REQUEST_ICON, prefilledOpts);
@@ -87,7 +90,7 @@ const ISSUE_ICON = `
 
 export function renderIssueIcon(opts?: ExtendedOcticonRenderOptions): string {
     const prefilledOpts: Required<OcticonRenderOptions> = {
-        color: opts?.color ?? "white",
+        color: opts?.color ?? GITHUB_GREEN_4_HEX,
         viewBox: opts?.viewBox ?? calculateViewbox("0 0 24 24", opts),
     };
     return renderOcticon(ISSUE_ICON, prefilledOpts);
@@ -110,7 +113,7 @@ export function renderReviewRequestedIcon(
     opts?: ExtendedOcticonRenderOptions,
 ): string {
     const prefilledOpts: Required<OcticonRenderOptions> = {
-        color: opts?.color ?? "white",
+        color: opts?.color ?? GITHUB_GREEN_4_HEX,
         viewBox: opts?.viewBox ?? calculateViewbox("0 0 24 24", opts),
     };
     return renderOcticon(REVIEW_REQUESTED_ICON, prefilledOpts);

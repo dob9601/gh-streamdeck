@@ -5,22 +5,22 @@
     "Author": "dob9601",
     "Actions": [
         {
-            "Name": "GitHub Monitor",
+            "Name": "Monitor",
             "UUID": "com.dob9601.gh-streamdeck.monitor",
-            "Icon": "imgs/actions/counter/icon",
+            "Icon": "imgs/plugin/octicons-eye",
             "Tooltip": "Displays a count, which increments by one on press.",
             "PropertyInspectorPath": "ui/increment-counter.html",
             "Controllers": ["Keypad"],
             "States": [
                 {
-                    "Image": "imgs/actions/monitor/github",
+                    "Image": "imgs/plugin/github",
                     "TitleAlignment": "bottom"
                 }
             ]
         }
     ],
     "Category": "GitHub",
-    "CategoryIcon": "imgs/plugin/category-icon",
+    "CategoryIcon": "imgs/plugin/github",
     "CodePath": "bin/plugin.js",
     "Description": "Monitor your GitHub assigned issues, pull requests and more from the comfort of your Stream Deck",
     "Icon": "imgs/plugin/marketplace",

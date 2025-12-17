@@ -1,13 +1,10 @@
 import streamDeck, {
     action,
-    DialAction,
-    DidReceiveSettingsEvent,
     KeyAction,
     KeyDownEvent,
     SingletonAction,
     WillAppearEvent,
 } from "@elgato/streamdeck";
-import { readFileSync } from "fs";
 import { Octokit } from "octokit";
 import {
     renderGithubIcon,
@@ -15,10 +12,6 @@ import {
     renderPullRequestIcon,
     renderReviewRequestedIcon,
 } from "../octicons";
-
-type IssuesSearchResult = Awaited<
-    ReturnType<Octokit["rest"]["search"]["issuesAndPullRequests"]>
->["data"]["items"]["0"];
 
 const PR_AUTHORED_QUERY = "is:pr is:open author:{USERNAME}";
 const PR_REVIEW_REQUESTED_QUERY = "is:pr is:open review-requested:{USERNAME}";
@@ -42,7 +35,10 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerSettings> {
         this.username = (
             await this.githubClient.rest.users.getAuthenticated()
         ).data.login;
-        this.startApiPolling();
+
+        if (!this.intervalId) {
+            this.startApiPolling();
+        }
     }
 
     startApiPolling() {
@@ -54,6 +50,9 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerSettings> {
             const issuesAndPullRequests =
                 this.githubClient?.rest.search.issuesAndPullRequests;
 
+            streamDeck.logger.info(
+                "Fetching pull requests, issues, and requested reviews...",
+            );
             const [
                 authoredPullRequestsResponse,
                 assignedIssuesResponse,
@@ -93,10 +92,21 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerSettings> {
             };
 
             let index = 0;
-            const actions = [...streamDeck.actions];
+            const actions = [...streamDeck.actions].sort((a, b) => {
+                const aRow = a.coordinates?.row ?? 0;
+                const bRow = b.coordinates?.row ?? 0;
+                if (aRow !== bRow) {
+                    return aRow - bRow;
+                }
+
+                const aCol = a.coordinates?.column ?? 0;
+                const bCol = b.coordinates?.column ?? 0;
+                return aCol - bCol;
+            });
 
             this.urlMapping = {};
 
+            streamDeck.logger.info("Rendering icons and updating keys...");
             outer: for (const [dataType, items] of Object.entries(data)) {
                 let icon;
                 if (dataType === "authoredPullRequests") {
@@ -128,6 +138,13 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerSettings> {
 
                     index += 1;
                 }
+
+                // for (const remainingAction of actions.slice(index)) {
+                //     await remainingAction.setImage(
+                //         renderGithubIcon({ border: 15 }),
+                //     );
+                //     await remainingAction.setTitle("");
+                // }
             }
         }, 15000);
     }
