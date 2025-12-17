@@ -24,8 +24,8 @@ const PR_AUTHORED_QUERY = "is:pr is:open author:{USERNAME}";
 const PR_REVIEW_REQUESTED_QUERY = "is:pr is:open review-requested:{USERNAME}";
 const ISSUE_ASSIGNED_QUERY = "is:issue is:open assignee:{USERNAME}";
 
-@action({ UUID: "com.dob9601.gh-streamdeck.increment" })
-export class IncrementCounter extends SingletonAction<GitHubTrackerSettings> {
+@action({ UUID: "com.dob9601.gh-streamdeck.monitor" })
+export class GithubMonitor extends SingletonAction<GitHubTrackerSettings> {
     private intervalId: NodeJS.Timeout | null = null;
     private githubClient: Octokit | null = null;
     private urlMapping: Record<string, string> = {};
@@ -65,6 +65,7 @@ export class IncrementCounter extends SingletonAction<GitHubTrackerSettings> {
                         this.username,
                     ),
                     per_page: streamDeck.actions.length,
+                    sort: "updated",
                 }),
                 issuesAndPullRequests?.({
                     q: ISSUE_ASSIGNED_QUERY.replaceAll(
@@ -72,6 +73,7 @@ export class IncrementCounter extends SingletonAction<GitHubTrackerSettings> {
                         this.username,
                     ),
                     per_page: streamDeck.actions.length,
+                    sort: "updated",
                 }),
                 issuesAndPullRequests?.({
                     q: PR_REVIEW_REQUESTED_QUERY.replaceAll(
@@ -79,6 +81,7 @@ export class IncrementCounter extends SingletonAction<GitHubTrackerSettings> {
                         this.username,
                     ),
                     per_page: streamDeck.actions.length,
+                    sort: "updated",
                 }),
             ]);
 

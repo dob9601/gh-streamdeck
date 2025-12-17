@@ -6,7 +6,7 @@
     "Actions": [
         {
             "Name": "GitHub Monitor",
-            "UUID": "com.dob9601.gh-streamdeck.increment",
+            "UUID": "com.dob9601.gh-streamdeck.monitor",
             "Icon": "imgs/actions/counter/icon",
             "Tooltip": "Displays a count, which increments by one on press.",
             "PropertyInspectorPath": "ui/increment-counter.html",
