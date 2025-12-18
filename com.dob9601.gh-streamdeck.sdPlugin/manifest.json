@@ -8,13 +8,14 @@
             "Name": "Monitor",
             "UUID": "com.dob9601.gh-streamdeck.monitor",
             "Icon": "imgs/plugin/octicons-eye",
-            "Tooltip": "Displays a count, which increments by one on press.",
-            "PropertyInspectorPath": "ui/increment-counter.html",
+            "Tooltip": "Monitor GitHub issues, pull requests and code reviews assigned to you",
+            "PropertyInspectorPath": "ui/monitor.html",
             "Controllers": ["Keypad"],
             "States": [
                 {
                     "Image": "imgs/plugin/github",
-                    "TitleAlignment": "bottom"
+                    "TitleAlignment": "bottom",
+                    "FontSize": 10
                 }
             ]
         }

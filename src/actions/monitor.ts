@@ -17,6 +17,10 @@ const PR_AUTHORED_QUERY = "is:pr is:open author:{USERNAME}";
 const PR_REVIEW_REQUESTED_QUERY = "is:pr is:open review-requested:{USERNAME}";
 const ISSUE_ASSIGNED_QUERY = "is:issue is:open assignee:{USERNAME}";
 
+type IssueOrPullRequest = Awaited<
+    ReturnType<Octokit["rest"]["search"]["issuesAndPullRequests"]>
+>["data"]["items"]["0"];
+
 @action({ UUID: "com.dob9601.gh-streamdeck.monitor" })
 export class GithubMonitor extends SingletonAction<GitHubTrackerSettings> {
     private intervalId: NodeJS.Timeout | null = null;
@@ -42,8 +46,64 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerSettings> {
     }
 
     startApiPolling() {
-        this.intervalId = setInterval(this.updateActions, 15000);
+        this.intervalId = setInterval(
+            async () => await this.updateActions(),
+            15000,
+        );
         this.updateActions();
+    }
+
+    private async fetchAuthoredPullRequests(): Promise<IssueOrPullRequest[]> {
+        if (!this.githubClient || !this.username) return [];
+
+        return (
+            await this.githubClient.rest.search.issuesAndPullRequests({
+                q: PR_AUTHORED_QUERY.replaceAll("{USERNAME}", this.username),
+                per_page: streamDeck.actions.length,
+                sort: "updated",
+            })
+        ).data.items;
+    }
+
+    private async fetchAssignedIssues(): Promise<IssueOrPullRequest[]> {
+        if (!this.githubClient || !this.username) return [];
+
+        return (
+            await this.githubClient.rest.search.issuesAndPullRequests({
+                q: ISSUE_ASSIGNED_QUERY.replaceAll("{USERNAME}", this.username),
+                per_page: streamDeck.actions.length,
+                sort: "updated",
+            })
+        ).data.items;
+    }
+
+    private async fetchReviewsRequested(): Promise<IssueOrPullRequest[]> {
+        if (!this.githubClient || !this.username) return [];
+
+        return (
+            await this.githubClient.rest.search.issuesAndPullRequests({
+                q: PR_REVIEW_REQUESTED_QUERY.replaceAll(
+                    "{USERNAME}",
+                    this.username,
+                ),
+                per_page: streamDeck.actions.length,
+                sort: "updated",
+            })
+        ).data.items;
+    }
+
+    static sortedActions(): KeyAction[] {
+        return [...streamDeck.actions].sort((a, b) => {
+            const aRow = a.coordinates?.row ?? 0;
+            const bRow = b.coordinates?.row ?? 0;
+            if (aRow !== bRow) {
+                return aRow - bRow;
+            }
+
+            const aCol = a.coordinates?.column ?? 0;
+            const bCol = b.coordinates?.column ?? 0;
+            return aCol - bCol;
+        }) as KeyAction[];
     }
 
     async updateActions() {
@@ -62,45 +122,19 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerSettings> {
             assignedIssuesResponse,
             reviewsRequestedResponse,
         ] = await Promise.all([
-            issuesAndPullRequests?.({
-                q: PR_AUTHORED_QUERY.replaceAll("{USERNAME}", this.username),
-                per_page: streamDeck.actions.length,
-                sort: "updated",
-            }),
-            issuesAndPullRequests?.({
-                q: ISSUE_ASSIGNED_QUERY.replaceAll("{USERNAME}", this.username),
-                per_page: streamDeck.actions.length,
-                sort: "updated",
-            }),
-            issuesAndPullRequests?.({
-                q: PR_REVIEW_REQUESTED_QUERY.replaceAll(
-                    "{USERNAME}",
-                    this.username,
-                ),
-                per_page: streamDeck.actions.length,
-                sort: "updated",
-            }),
+            this.fetchAuthoredPullRequests(),
+            this.fetchAssignedIssues(),
+            this.fetchReviewsRequested(),
         ]);
 
         const data = {
-            authoredPullRequests:
-                authoredPullRequestsResponse?.data.items ?? [],
-            assignedIssues: assignedIssuesResponse?.data.items ?? [],
-            reviewsRequested: reviewsRequestedResponse?.data.items ?? [],
+            authoredPullRequests: authoredPullRequestsResponse,
+            assignedIssues: assignedIssuesResponse,
+            reviewsRequested: reviewsRequestedResponse,
         };
 
+        const actions = GithubMonitor.sortedActions();
         let index = 0;
-        const actions = [...streamDeck.actions].sort((a, b) => {
-            const aRow = a.coordinates?.row ?? 0;
-            const bRow = b.coordinates?.row ?? 0;
-            if (aRow !== bRow) {
-                return aRow - bRow;
-            }
-
-            const aCol = a.coordinates?.column ?? 0;
-            const bCol = b.coordinates?.column ?? 0;
-            return aCol - bCol;
-        });
 
         this.urlMapping = {};
 
@@ -108,13 +142,13 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerSettings> {
         outer: for (const [dataType, items] of Object.entries(data)) {
             let icon;
             if (dataType === "authoredPullRequests") {
-                icon = renderPullRequestIcon({ border: 15, yOffset: -10 });
+                icon = renderPullRequestIcon({ border: 13, yOffset: -7 });
             } else if (dataType === "assignedIssues") {
-                icon = renderIssueIcon({ border: 15, yOffset: -10 });
+                icon = renderIssueIcon({ border: 13, yOffset: -7 });
             } else if (dataType === "reviewsRequested") {
                 icon = renderReviewRequestedIcon({
-                    border: 15,
-                    yOffset: -10,
+                    border: 13,
+                    yOffset: -7,
                 });
             }
 
@@ -128,7 +162,9 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerSettings> {
                 const repoName = item.repository_url
                     .split("/")
                     .slice(-1)
-                    .join("/");
+                    .join("/")
+                    .replace(/(.{11})/g, "$1\n")
+                    .trimEnd();
 
                 await action.setTitle(`${repoName}\n#${item.number}`);
 
@@ -156,4 +192,5 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerSettings> {
 
 type GitHubTrackerSettings = {
     accessToken: string;
+    wrapText: boolean;
 };
