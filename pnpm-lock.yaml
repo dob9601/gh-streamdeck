@@ -11,6 +11,12 @@ importers:
       '@elgato/streamdeck':
         specifier: ^2.0.0
         version: 2.0.0
+      '@types/lodash':
+        specifier: ^4.17.21
+        version: 4.17.21
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       octokit:
         specifier: ^5.0.5
         version: 5.0.5
@@ -495,6 +501,9 @@ packages:
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
+
+  '@types/lodash@4.17.21':
+    resolution: {integrity: sha512-FOvQ0YPD5NOfPgMzJihoT+Za5pdkDJWcbpuj1DjaKZIr/gxodQjY/uWEFlTNqW2ugXHUiL8lRQgw63dzKHZdeQ==}
 
   '@types/node@20.15.0':
     resolution: {integrity: sha512-eQf4OkH6gA9v1W0iEpht/neozCsZKMTK+C4cU6/fv7wtJCCL8LEQ4hie2Ln8ZP/0YYM2xGj7//f8xyqItkJ6QA==}
@@ -1312,6 +1321,8 @@ snapshots:
   '@types/aws-lambda@8.10.159': {}
 
   '@types/estree@1.0.8': {}
+
+  '@types/lodash@4.17.21': {}
 
   '@types/node@20.15.0':
     dependencies:

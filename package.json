@@ -18,6 +18,8 @@
     },
     "dependencies": {
         "@elgato/streamdeck": "^2.0.0",
+        "@types/lodash": "^4.17.21",
+        "lodash": "^4.17.21",
         "octokit": "^5.0.5"
     }
 }

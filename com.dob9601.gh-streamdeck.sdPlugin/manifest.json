@@ -7,13 +7,27 @@
         {
             "Name": "Monitor",
             "UUID": "com.dob9601.gh-streamdeck.monitor",
-            "Icon": "imgs/plugin/octicons-eye",
+            "Icon": "imgs/actions/monitor/octicons-eye",
             "Tooltip": "Monitor GitHub issues, pull requests and code reviews assigned to you",
             "PropertyInspectorPath": "ui/monitor.html",
             "Controllers": ["Keypad"],
             "States": [
                 {
                     "Image": "imgs/plugin/github",
+                    "TitleAlignment": "bottom",
+                    "FontSize": 10
+                }
+            ]
+        },
+        {
+            "Name": "Toggle Filter",
+            "UUID": "com.dob9601.gh-streamdeck.toggle-filter",
+            "Icon": "imgs/actions/filter-toggle/octicons-filter",
+            "Tooltip": "Update the current filter settings",
+            "Controllers": ["Keypad"],
+            "States": [
+                {
+                    "Image": "imgs/actions/filter-toggle/octicons-filter",
                     "TitleAlignment": "bottom",
                     "FontSize": 10
                 }
