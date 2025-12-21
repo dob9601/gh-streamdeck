@@ -1,39 +1,50 @@
 import streamDeck from "@elgato/streamdeck";
 
 import { GithubMonitor } from "./actions/monitor";
-import _, { last } from "lodash";
-import { ToggleFilter } from "./actions/toggle-filter";
-
-export enum FilterState {
-    ShowAll,
-    ShowIssues,
-    ShowCodeReviews,
-}
+import _ from "lodash";
+import { FilterState, ToggleFilter } from "./actions/toggle-filter";
+import { OffsetLeft } from "./actions/offset/left";
+import { OffsetRight } from "./actions/offset/right";
+import { DataStore } from "./data-store";
 
 export type GitHubTrackerGlobalSettings = {
     accessToken: string;
     wrapText: boolean;
     filterState: FilterState;
+    offset: number;
 };
 
-// We can enable "trace" logging so that all messages between the Stream Deck, and the plugin are recorded. When storing sensitive information
 streamDeck.logger.setLevel("debug");
 
-const monitor = new GithubMonitor();
-// Register the increment action.
+const dataStore = new DataStore();
+
+const monitor = new GithubMonitor(dataStore);
 streamDeck.actions.registerAction(monitor);
-streamDeck.actions.registerAction(new ToggleFilter());
+streamDeck.actions.registerAction(new ToggleFilter(dataStore));
+
+const offsetLeft = new OffsetLeft(dataStore);
+streamDeck.actions.registerAction(offsetLeft);
+const offsetRight = new OffsetRight(dataStore);
+streamDeck.actions.registerAction(offsetRight);
 
 let lastGlobalSettings: GitHubTrackerGlobalSettings | null = null;
 streamDeck.settings.onDidReceiveGlobalSettings<GitHubTrackerGlobalSettings>(
     async (event) => {
-        if (!_.isEqual(lastGlobalSettings, event.settings)) {
-            streamDeck.logger.info("Received updated global settings");
-
-            monitor.refreshGithubClient(event.settings.accessToken);
-            monitor.triggerApiPolling();
-            lastGlobalSettings = event.settings;
+        if (lastGlobalSettings?.wrapText !== event.settings.wrapText) {
+            monitor.renderActions();
         }
+
+        if (lastGlobalSettings?.offset !== event.settings.offset) {
+            monitor.renderActions();
+            offsetLeft.renderState(event.settings.offset);
+            offsetRight.renderState(event.settings.offset);
+        }
+
+        if (lastGlobalSettings?.accessToken !== event.settings.accessToken) {
+            dataStore.refreshGithubClient(event.settings.accessToken);
+        }
+
+        lastGlobalSettings = event.settings;
     },
 );
 

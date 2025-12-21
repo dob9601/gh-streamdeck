@@ -27,7 +27,35 @@
             "Controllers": ["Keypad"],
             "States": [
                 {
-                    "Image": "imgs/actions/filter-toggle/octicons-filter",
+                    "Image": "imgs/actions/filter-toggle/octicons-filter-bordered",
+                    "TitleAlignment": "bottom",
+                    "FontSize": 10
+                }
+            ]
+        },
+        {
+            "Name": "Previous Page",
+            "UUID": "com.dob9601.gh-streamdeck.offset-left",
+            "Icon": "imgs/actions/filter-toggle/octicons-filter",
+            "Tooltip": "Update the current filter settings",
+            "Controllers": ["Keypad"],
+            "States": [
+                {
+                    "Image": "imgs/actions/filter-toggle/octicons-filter-bordered",
+                    "TitleAlignment": "bottom",
+                    "FontSize": 10
+                }
+            ]
+        },
+        {
+            "Name": "Next Page",
+            "UUID": "com.dob9601.gh-streamdeck.offset-right",
+            "Icon": "imgs/actions/filter-toggle/octicons-filter", 
+            "Tooltip": "Update the current filter settings",
+            "Controllers": ["Keypad"],
+            "States": [
+                {
+                    "Image": "imgs/actions/filter-toggle/octicons-filter-bordered",
                     "TitleAlignment": "bottom",
                     "FontSize": 10
                 }

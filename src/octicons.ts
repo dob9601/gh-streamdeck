@@ -30,7 +30,7 @@ interface OcticonRenderOptions {
     viewBox: string;
 }
 
-interface ExtendedOcticonRenderOptions extends Partial<OcticonRenderOptions> {
+export interface ExtendedOcticonRenderOptions extends Partial<OcticonRenderOptions> {
     border?: number;
     xOffset?: number;
     yOffset?: number;
@@ -141,6 +141,96 @@ export function renderReviewRequestedIcon(
         viewBox: opts?.viewBox ?? calculateViewbox("0 0 24 24", opts),
     };
     return renderOcticon(REVIEW_REQUESTED_ICON, prefilledOpts);
+}
+
+const FILTER_ICON = `
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="{VIEW_BOX}"
+    width="24"
+    height="24"
+    fill="{COLOR}"
+>
+    <path
+        d="M2.75 6a.75.75 0 0 0 0 1.5h18.5a.75.75 0 0 0 0-1.5H2.75ZM6 11.75a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H6.75a.75.75 0 0 1-.75-.75Zm4 4.938a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"
+    />
+</svg>
+`;
+export function renderFilterIcon(opts?: ExtendedOcticonRenderOptions): string {
+    const prefilledOpts: Required<OcticonRenderOptions> = {
+        color: opts?.color ?? "white",
+        viewBox: opts?.viewBox ?? calculateViewbox("0 0 24 24", opts),
+    };
+    return renderOcticon(FILTER_ICON, prefilledOpts);
+}
+
+const CIRCLE_SLASH_ICON = `
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="{VIEW_BOX}"
+    width="24"
+    height="24"
+    fill="{COLOR}"
+>
+    <path d="M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1ZM5.834 19.227A9.464 9.464 0 0 0 12 21.5a9.5 9.5 0 0 0 9.5-9.5 9.464 9.464 0 0 0-2.273-6.166ZM2.5 12a9.464 9.464 0 0 0 2.273 6.166L18.166 4.773A9.463 9.463 0 0 0 12 2.5 9.5 9.5 0 0 0 2.5 12Z">
+    </path>
+</svg>
+`;
+
+export function renderCircleSlashIcon(
+    opts?: ExtendedOcticonRenderOptions,
+): string {
+    const prefilledOpts: Required<OcticonRenderOptions> = {
+        color: opts?.color ?? "white",
+        viewBox: opts?.viewBox ?? calculateViewbox("0 0 24 24", opts),
+    };
+    return renderOcticon(CIRCLE_SLASH_ICON, prefilledOpts);
+}
+
+const CHEVRON_LEFT_ICON = `
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="{VIEW_BOX}"
+    width="24"
+    height="24"
+    fill="{COLOR}"
+>
+    <path d="M15.28 5.22a.75.75 0 0 1 0 1.06L9.56 12l5.72 5.72a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215l-6.25-6.25a.75.75 0 0 1 0-1.06l6.25-6.25a.75.75 0 0 1 1.06 0Z">
+    </path>
+</svg>
+`;
+
+export function renderChevronLeftIcon(
+    opts?: ExtendedOcticonRenderOptions,
+): string {
+    const prefilledOpts: Required<OcticonRenderOptions> = {
+        color: opts?.color ?? "white",
+        viewBox: opts?.viewBox ?? calculateViewbox("0 0 24 24", opts),
+    };
+    return renderOcticon(CHEVRON_LEFT_ICON, prefilledOpts);
+}
+
+const CHEVRON_RIGHT_ICON = `
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="{VIEW_BOX}"
+    width="24"
+    height="24"
+    fill="{COLOR}"
+>
+    <path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z">
+    </path>
+</svg>
+`;
+
+export function renderChevronRightIcon(
+    opts?: ExtendedOcticonRenderOptions,
+): string {
+    const prefilledOpts: Required<OcticonRenderOptions> = {
+        color: opts?.color ?? "white",
+        viewBox: opts?.viewBox ?? calculateViewbox("0 0 24 24", opts),
+    };
+    return renderOcticon(CHEVRON_RIGHT_ICON, prefilledOpts);
 }
 
 function calculateViewbox(

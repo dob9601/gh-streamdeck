@@ -5,41 +5,32 @@ import streamDeck, {
     SingletonAction,
     WillAppearEvent,
 } from "@elgato/streamdeck";
-import { Octokit } from "octokit";
 import {
-    renderGithubIcon,
+    renderCircleSlashIcon,
     renderIssueIcon,
     renderPullRequestIcon,
     renderReviewRequestedIcon,
 } from "../octicons";
 import { GitHubTrackerGlobalSettings } from "../plugin";
 import _ from "lodash";
+import { FilterState } from "./toggle-filter";
+import { DataStore, UserData } from "../data-store";
 
-const PR_AUTHORED_QUERY = "is:pr is:open author:{USERNAME}";
-const PR_REVIEW_REQUESTED_QUERY = "is:pr is:open review-requested:{USERNAME}";
-const ISSUE_ASSIGNED_QUERY = "is:issue is:open assignee:{USERNAME}";
-const FETCH_FREQUENCY_MS = 15_000;
-
-interface UserData {
-    assignedIssues: IssueOrPullRequest[];
-    authoredPullRequests: IssueOrPullRequest[];
-    requestedReviews: IssueOrPullRequest[];
-}
-
-type IssueOrPullRequest = Awaited<
-    ReturnType<Octokit["rest"]["search"]["issuesAndPullRequests"]>
->["data"]["items"]["0"];
-
-const MONITOR_UUID = "com.dob9601.gh-streamdeck.monitor";
+export const MONITOR_UUID = "com.dob9601.gh-streamdeck.monitor";
 
 @action({ UUID: MONITOR_UUID })
 export class GithubMonitor extends SingletonAction<GitHubTrackerGlobalSettings> {
-    private intervalId: NodeJS.Timeout | null = null;
-    private githubClient: Octokit | null = null;
     private urlMapping: Record<string, string> = {};
-    private username: string | null = null;
-    private globalSettings: GitHubTrackerGlobalSettings | null = null;
-    private data: UserData | null = null;
+
+    private dataStore: DataStore;
+
+    constructor(dataStore: DataStore) {
+        super();
+        this.dataStore = dataStore;
+        this.dataStore.addRenderCallback(
+            async () => await this.renderActions(),
+        );
+    }
 
     private renderActionsThrottled = _.throttle(
         async () => await this.renderActions(),
@@ -49,70 +40,11 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerGlobalSettings> 
     override async onWillAppear(
         _ev: WillAppearEvent<GitHubTrackerGlobalSettings>,
     ): Promise<void> {
-        if (!this.intervalId) {
-            this.triggerApiPolling();
-        } else {
-            this.renderActionsThrottled();
-        }
-    }
-
-    triggerApiPolling() {
-        if (this.intervalId) {
-            return;
-        }
-
-        streamDeck.logger.info("Starting api polling...");
-
-        this.intervalId = setInterval(async () => {
-            await this.fetchData();
-        }, FETCH_FREQUENCY_MS);
-        this.fetchData();
-    }
-
-    async fetchData() {
-        if (this.globalSettings === null) {
-            this.globalSettings =
-                await streamDeck.settings.getGlobalSettings<GitHubTrackerGlobalSettings>();
-        }
-
-        if (this.githubClient === null) {
-            this.refreshGithubClient(this.globalSettings.accessToken);
-        }
-
-        if (!this.username) {
-            this.username = (
-                await this.githubClient!.rest.users.getAuthenticated()
-            ).data.login;
-        }
-
-        streamDeck.logger.info(
-            "Fetching pull requests, issues, and requested reviews...",
-        );
-        const [
-            authoredPullRequestsResponse,
-            assignedIssuesResponse,
-            reviewsRequestedResponse,
-        ] = await Promise.all([
-            this.fetchAuthoredPullRequests(),
-            this.fetchAssignedIssues(),
-            this.fetchReviewsRequested(),
-        ]);
-
-        this.data = {
-            authoredPullRequests: authoredPullRequestsResponse,
-            assignedIssues: assignedIssuesResponse,
-            requestedReviews: reviewsRequestedResponse,
-        };
-
-        streamDeck.logger.info(
-            `Successfully fetched ${authoredPullRequestsResponse.length} authored pull requests, ${assignedIssuesResponse.length} assigned issues, and ${reviewsRequestedResponse.length} requested reviews`,
-        );
-
-        this.renderActions();
+        this.renderActionsThrottled();
     }
 
     async renderActions() {
-        streamDeck.logger.info("Rerendering data...");
+        streamDeck.logger.info("Rendering actions...");
         const settings =
             await streamDeck.settings.getGlobalSettings<GitHubTrackerGlobalSettings>();
 
@@ -121,14 +53,11 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerGlobalSettings> 
 
         this.urlMapping = {};
 
-        if (!this.data) {
-            return;
-        }
+        let toSkip = settings.offset;
 
-        streamDeck.logger.info("Rendering icons and updating keys...");
-
-        outer: for (const dataType of Object.keys(this.data)) {
-            const items = this.data[dataType as keyof UserData];
+        const data = this.dataStore.getData(settings.filterState);
+        outer: for (const dataType of Object.keys(data)) {
+            const items = data[dataType as keyof UserData];
 
             let icon;
             if (dataType === "authoredPullRequests") {
@@ -143,6 +72,11 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerGlobalSettings> 
             }
 
             for (const item of items) {
+                if (toSkip > 0) {
+                    toSkip -= 1;
+                    continue;
+                }
+
                 const action = actions[index] as KeyAction;
                 if (!action) {
                     break outer;
@@ -176,47 +110,13 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerGlobalSettings> 
         }
 
         for (const remainingAction of remainingActions) {
-            await remainingAction.setImage(renderGithubIcon({ border: 15 }));
+            await remainingAction.setImage(
+                renderCircleSlashIcon({ border: 15 }),
+            );
             await remainingAction.setTitle("");
         }
 
         streamDeck.logger.info("Successfully finished updating state");
-    }
-
-    private async fetchAuthoredPullRequests(): Promise<IssueOrPullRequest[]> {
-        if (!this.githubClient || !this.username) return [];
-
-        return (
-            await this.githubClient.rest.search.issuesAndPullRequests({
-                q: PR_AUTHORED_QUERY.replaceAll("{USERNAME}", this.username),
-                sort: "updated",
-            })
-        ).data.items;
-    }
-
-    private async fetchAssignedIssues(): Promise<IssueOrPullRequest[]> {
-        if (!this.githubClient || !this.username) return [];
-
-        return (
-            await this.githubClient.rest.search.issuesAndPullRequests({
-                q: ISSUE_ASSIGNED_QUERY.replaceAll("{USERNAME}", this.username),
-                sort: "updated",
-            })
-        ).data.items;
-    }
-
-    private async fetchReviewsRequested(): Promise<IssueOrPullRequest[]> {
-        if (!this.githubClient || !this.username) return [];
-
-        return (
-            await this.githubClient.rest.search.issuesAndPullRequests({
-                q: PR_REVIEW_REQUESTED_QUERY.replaceAll(
-                    "{USERNAME}",
-                    this.username,
-                ),
-                sort: "updated",
-            })
-        ).data.items;
     }
 
     static sortedActions(): KeyAction[] {
@@ -243,11 +143,5 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerGlobalSettings> 
         if (url) {
             await streamDeck.system.openUrl(url);
         }
-    }
-
-    refreshGithubClient(token: string) {
-        this.githubClient = new Octokit({
-            auth: token,
-        });
     }
 }
