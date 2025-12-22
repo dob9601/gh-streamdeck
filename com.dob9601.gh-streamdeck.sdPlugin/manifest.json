@@ -22,7 +22,7 @@
         {
             "Name": "Toggle Filter",
             "UUID": "com.dob9601.gh-streamdeck.toggle-filter",
-            "Icon": "imgs/actions/filter-toggle/octicons-filter",
+            "Icon": "imgs/octicons/filter",
             "Tooltip": "Update the current filter settings",
             "Controllers": ["Keypad"],
             "States": [
