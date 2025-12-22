@@ -3,6 +3,7 @@ import { renderChevronLeftIcon } from "../../octicons";
 import { OffsetActionBase } from "./base";
 import { DataStore } from "../../data-store";
 import { GitHubTrackerGlobalSettings } from "../../plugin";
+import { GithubMonitor } from "../monitor";
 
 const OFFSET_LEFT_UUID = "com.dob9601.gh-streamdeck.offset-left";
 
@@ -26,6 +27,6 @@ export class OffsetLeft extends OffsetActionBase {
     }
 
     override updateOffset(offset: number): number {
-        return Math.max(0, offset - this.monitorCount());
+        return Math.max(0, offset - GithubMonitor.pageSize());
     }
 }

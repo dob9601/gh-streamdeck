@@ -57,12 +57,10 @@ const PULL_REQUEST_ICON = readFileSync(
 export function renderPullRequestIcon(
     opts?: ExtendedOcticonRenderOptions,
 ): string {
-    streamDeck.logger.info(PULL_REQUEST_ICON);
     const prefilledOpts: Required<OcticonRenderOptions> = {
         color: opts?.color ?? GITHUB_GREEN_4_HEX,
         viewBox: opts?.viewBox ?? calculateViewbox("0 0 24 24", opts),
     };
-    streamDeck.logger.info(renderOcticon(PULL_REQUEST_ICON, prefilledOpts));
     return renderOcticon(PULL_REQUEST_ICON, prefilledOpts);
 }
 

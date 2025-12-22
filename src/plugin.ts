@@ -6,6 +6,7 @@ import { FilterState, ToggleFilter } from "./actions/toggle-filter";
 import { OffsetLeft } from "./actions/offset/left";
 import { OffsetRight } from "./actions/offset/right";
 import { DataStore } from "./data-store";
+import { PageIndicator } from "./actions/page-indicator";
 
 export type GitHubTrackerGlobalSettings = {
     accessToken: string;
@@ -26,6 +27,8 @@ const offsetLeft = new OffsetLeft(dataStore);
 streamDeck.actions.registerAction(offsetLeft);
 const offsetRight = new OffsetRight(dataStore);
 streamDeck.actions.registerAction(offsetRight);
+
+streamDeck.actions.registerAction(new PageIndicator(dataStore));
 
 let lastGlobalSettings: GitHubTrackerGlobalSettings | null = null;
 streamDeck.settings.onDidReceiveGlobalSettings<GitHubTrackerGlobalSettings>(

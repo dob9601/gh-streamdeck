@@ -73,12 +73,6 @@ export class OffsetActionBase extends SingletonAction {
         throw new Error("Method not implemented");
     }
 
-    protected monitorCount(): number {
-        return streamDeck.actions.filter(
-            (action) => action.manifestId === MONITOR_UUID,
-        ).length;
-    }
-
     async renderIcon(): Promise<string> {
         throw new Error("Method not implemented.");
     }

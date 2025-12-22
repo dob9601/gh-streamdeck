@@ -144,4 +144,10 @@ export class GithubMonitor extends SingletonAction<GitHubTrackerGlobalSettings> 
             await streamDeck.system.openUrl(url);
         }
     }
+
+    static pageSize(): number {
+        return streamDeck.actions.filter(
+            (action) => action.manifestId === MONITOR_UUID,
+        ).length;
+    }
 }

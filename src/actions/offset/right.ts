@@ -6,6 +6,7 @@ import {
 } from "../../octicons";
 import { OffsetActionBase } from "./base";
 import { DataStore } from "../../data-store";
+import { GithubMonitor } from "../monitor";
 
 const OFFSET_RIGHT_UUID = "com.dob9601.gh-streamdeck.offset-right";
 
@@ -29,7 +30,10 @@ export class OffsetRight extends OffsetActionBase {
     }
 
     override async updateOffset(offset: number): Promise<number> {
-        return Math.min(await this.maxOffset(), offset + this.monitorCount());
+        return Math.min(
+            await this.maxOffset(),
+            offset + GithubMonitor.pageSize(),
+        );
     }
 
     private async itemCount(): Promise<number> {
@@ -41,6 +45,6 @@ export class OffsetRight extends OffsetActionBase {
     }
 
     private async maxOffset(): Promise<number> {
-        return (await this.itemCount()) - this.monitorCount();
+        return Math.max((await this.itemCount()) - GithubMonitor.pageSize(), 0);
     }
 }

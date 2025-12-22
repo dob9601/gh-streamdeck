@@ -36,8 +36,8 @@
         {
             "Name": "Previous Page",
             "UUID": "com.dob9601.gh-streamdeck.offset-left",
-            "Icon": "imgs/actions/filter-toggle/octicons-filter",
-            "Tooltip": "Update the current filter settings",
+            "Icon": "imgs/octicons/chevron-left",
+            "Tooltip": "Show the previous page of results",
             "Controllers": ["Keypad"],
             "States": [
                 {
@@ -50,14 +50,28 @@
         {
             "Name": "Next Page",
             "UUID": "com.dob9601.gh-streamdeck.offset-right",
-            "Icon": "imgs/actions/filter-toggle/octicons-filter", 
-            "Tooltip": "Update the current filter settings",
+            "Icon": "imgs/octicons/chevron-right",
+            "Tooltip": "Show the next page of results",
             "Controllers": ["Keypad"],
             "States": [
                 {
                     "Image": "imgs/actions/filter-toggle/octicons-filter-bordered",
                     "TitleAlignment": "bottom",
                     "FontSize": 10
+                }
+            ]
+        },
+        {
+            "Name": "Page Indicator",
+            "UUID": "com.dob9601.gh-streamdeck.page-indicator",
+            "Icon": "imgs/octicons/number",
+            "Tooltip": "Show the number of the current page of results",
+            "Controllers": ["Keypad"],
+            "States": [
+                {
+                    "Image": "",
+                    "TitleAlignment": "middle",
+                    "FontSize": 20
                 }
             ]
         }
